@@ -1,24 +1,26 @@
-# ベースイメージ (安定のPython 3.12系を想定)
+# ベースイメージ
 FROM python:3.12-slim
 
-# 作業ディレクトリ
+# コンテナ内の作業ディレクトリ
 WORKDIR /app
 
-# 依存関係をコピー＆インストール
+# 依存ファイルコピー＆インストール
 COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /app/requirements.txt
 
-# アプリ本体をコピー
+# アプリ本体コピー
 COPY app /app/app
 COPY start.sh /app/start.sh
 
-# state.jsonを保存する永続ディスクをここにマウントする想定
-# RenderのDisk機能で /data を永続化させる
-RUN mkdir -p /data && chmod 777 /data
+# start.sh を実行可能にする
+# /data は Render の永続ディスクをマウントする場所 (STATE_DIRで使う)
+RUN chmod +x /app/start.sh && \
+    mkdir -p /data && chmod 777 /data
+
+# アプリが使う環境変数のデフォルト
 ENV STATE_DIR=/data
 ENV CHECK_INTERVAL_SECONDS=300
 
-# Render は $PORT を渡してくるのでそれを使ってuvicorn起動
-# DISCORD_WEBHOOK_URL もRenderの環境変数で渡す
-CMD ["./start.sh"]
+# Renderがくれる $PORT で uvicorn を起動する
+CMD ["/app/start.sh"]
