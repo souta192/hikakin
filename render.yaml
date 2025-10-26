@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: youtube-discord-notifier
+    env: docker
+    autoDeploy: true
+    healthCheckPath: /status
+
+    # Renderの「Disks」機能を使って /data を永続化して
+    # state.json を保持する
+    disk:
+      name: notifier-state
+      mountPath: /data
+      sizeGB: 1
+
+    envVars:
+      - key: DISCORD_WEBHOOK_URL
+        sync: false          # Renderのダッシュボードで値を入れる(秘密)
+      - key: CHECK_INTERVAL_SECONDS
+        value: "300"
+      - key: STATE_DIR
+        value: "/data"

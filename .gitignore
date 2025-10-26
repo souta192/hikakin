@@ -1,0 +1,14 @@
+﻿venv/
+.venv/
+__pycache__/
+*.log
+
+state.json
+data/
+data/**
+/data
+/data/**
+/data/state.json
+
+.env
+.env.local
